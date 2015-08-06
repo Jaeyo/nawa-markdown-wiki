@@ -10,12 +10,10 @@ View.prototype = {
 	init: function(){
 		hljs.initHighlightingOnLoad();
 
-		console.log('cp1');//DEBUG
 		$('.contents table').each(function(index, value){
 			console.log(value);//DEBUG
 			$(value).addClass('table table-striped table-bordered');
 		});
-		console.log('cp2'); //DEBUG
 	} //init
 }; //View
 

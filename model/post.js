@@ -1,18 +1,14 @@
 var logger = require('../util/logger').getLogger(),
-	fsUtil = require('../util/fs-util'),
-	PostMeta = require('./post-meta'),
-	fs = require('fs'),
-	moment = require('moment'),
-	path = require('path'),
-	walk = require('walk'),
-	Joi = require('joi');
+	Joi = require('joi'),
+	postDB = require('../db/db').postDB;
 
 function Post(){
 	/*
 	 * {
 	 * 		title: (string),
 	 * 		contents: (string),
-	 * 		regdate: (date)
+	 * 		regdate: (date),
+	 * 		isRecent: (boolean)
 	 * }
 	 */
 } //INIT
@@ -22,8 +18,10 @@ module.exports = Post;
 var schema = Joi.object().keys({
 	title: Joi.string(),
 	contents: Joi.string(),
-	regdate: Joi.date()
+	regdate: Joi.date(),
+	isRecent: Joi.boolean()
 });
+
 
 Post.prototype = {
 	setTitle: function(title){
@@ -42,66 +40,129 @@ Post.prototype = {
 		this.regdate = regdate;
 		Joi.validate(this, schema, function(err, value){ if(err) throw err; });
 		return this;
-	} //setRegdate
+	}, //setRegdate
+	
+	setIsRecent: function(isRecent){
+		this.isRecent = isRecent;
+		Joi.validate(this, schema, function(err, value){ if(err) throw err; });
+		return this;
+	} //setIsrecent
 }; //Post
 
 Post.save = function(post){
-	Joi.validate(post, schema, function(err, value){ if(err) throw err; });
-	var filename = post.title + '.' + moment().format('YYYYMMDDHHmmss') + '.md';
 	return new Promise(function(resolve, reject){
-		fsUtil.writeFile('data/' + filename, post.contents)
-		.then(function(){
-			return PostMeta.refresh();
+		Joi.validate(post, schema, function(err, value){ if(err) throw err; });
+		new Promise(function(resolve, reject){
+			postDB.update({title: post.title, isRecent: true}, 
+				{$set: {isRecent: false} }, 
+				{multi: true}, 
+				function(err, numReplaced){
+					if(err){ reject(err); return; }
+					resolve();
+			});
 		}).then(function(){
-			resolve();
-		}).catch(function(e){
-			reject(JSON.stringify({err: e, filename: __filename, line: __line}));
+			postDB.insert(post, function(err, newDoc){
+				if(err){ reject(err); return; }
+				resolve();
+			});
 		});
 	});
 }; //save
 
 Post.load = function(title){
 	return new Promise(function(resolve, reject){
-		var postMeta = PostMeta.load(title);
-		if(postMeta === undefined ){
-			reject(JSON.stringify({errmsg: 'no post exists', title: title, filename: __filename, line: __line}));
-			return;
-		} //if
-
-		var filepath = path.join('data/', postMeta.filename);
-		var regdate = moment(/(.*)(\.)(\d{14})(.md)$/g.exec(postMeta.filename)[3], 'YYYYMMDDHHmmss').toDate();
-		fs.readFile(filepath, {encoding: 'utf8'}, function(err, data){
-			if(err){
-				 reject(JSON.stringify({err: err, filename: __filename, line: __line}));
-				 return;
-			} //if
-			
-			resolve(new Post().setTitle(title).setContents(data).setRegdate(regdate));
+		postDB.findOne({title: title, isRecent: true}, function(err, doc){
+			if(err){ reject(err); return; }
+			if(doc === null){ resolve(null); return; }
+			var post = new Post()
+				.setTitle(doc.title)
+				.setContents(doc.contents)
+				.setRegdate(doc.regdate)
+				.setIsRecent(doc.isRecent);
+			resolve(post);
 		});
 	});
 }; //load
 
+Post.loadAll = function(){
+	return new Promise(function(resolve, reject){
+		postDB.find(null, function(err, docs){
+			if(err){ reject(err); return; }
+			var posts = [];
+			docs.forEach(function(doc){
+				var post = new Post()
+					.setTitle(doc.title)
+					.setContents(doc.contents)
+					.setRegdate(doc.regdate)
+					.setIsRecent(doc.isRecent);
+				posts.push(post);
+			});
+			resolve(posts);
+		});
+	});
+}; //loadAll
+
 Post.delete = function(title){
 	return new Promise(function(resolve, reject){
-		var walker = walk.walk('./data', {followLinks: false});
-		var regex = new RegExp('(' + title + '.)(\\d{14})(.md)$');
-		walker.on('file', function(root, file, next){
-			try{
-				var filepath = path.join(root, file.name).substring('data/'.length);
-				if(regex.test(filepath) === false)
-					return;
-				
-				var targetFile = path.join(root, file.name);
-				fs.rename(targetFile, targetFile+'.deleted', function(err){
-					if(err) reject(JSON.stringify({ err: err, filename: __filename, line: __line }));
-				});
-			} finally{
-				next();
-			} //finally
-		});
-
-		walker.on('end', function(){
+		postDB.update( {title: title}, {$set: {isRecent: false}}, {multi: true}, function(err, numReplaced){
+			if(err){ reject(err); return; }
 			resolve();
 		});
 	});
 }; //delete
+
+Post.titles = function(){
+	return new Promise(function(resolve, reject){
+		postDB.find( {isRecent: true}, function(err, docs){
+			if(err){ reject(err); return; }
+			var titles = [];
+			docs.forEach(function(doc){
+				titles.push(doc.title);
+			});
+			resolve(titles);
+		});
+	});
+}; //titles
+
+Post.titleTree = function(){
+	return new Promise(function(resolve, reject){
+		var treeData = [];
+		Post.titles().then(function(titles){
+			titles.forEach(function(title){
+				if(title.indexOf('/') < 0) {
+					treeData.push({ text: title, data: '/Wiki/'+title+'/', icon: 'glyphicon glyphicon-file' });
+					return;
+				} //if
+				
+				var findNodeWithText = function(root, text){
+					for(var i=0; i<root.length; i++)
+						if(root[i].text === text && root[i].children !== undefined) return root[i];
+					return null;
+				}; //isRootHasObjectWithText
+		
+				var root = treeData;
+				var splitedTitle = title.split('/');
+				for(var i=0; i<splitedTitle.length; i++){
+					var word = splitedTitle[i];
+		
+					if(i === splitedTitle.length-1){ //if post
+						root.push({ text: word, data: '/Wiki/'+title+'/', icon: 'glyphicon glyphicon-file' });
+						continue;
+					}  //if
+		
+					var node = findNodeWithText(root, word); 
+					if(node !== null){ //if folder exists
+						root = node.children;
+						continue;
+					} //if
+		
+					//if folder not exists
+					var children = [];
+					root.push({ text: word, state: {opened: true}, children: children });
+					root = children;
+				} //for in splitedTitle
+			});
+			resolve(treeData);
+		});
+	});
+}; //titleTree

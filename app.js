@@ -4,9 +4,7 @@ var express = require('express'),
 	path = require('path'),
 	search = require('./search'),
 	conf = require('./util/conf'),
-	stringUtil = require('./util/string-util'),
 	logger = require('./util/logger').getLogger(),
-	PostMeta = require('./model/post-meta'),
 	app = express(),
 	server = require('http').Server(app),
 	io = require('socket.io').listen(server);
@@ -28,11 +26,7 @@ fs.readdirSync('./controllers').forEach(function(file){
 
 setGlobalProperties();
 
-PostMeta.refresh().then(function(){
-	search.indexAllPost();
-}).catch(function(e){
-	logger.error({err: e.toString(), filename: __filename, line: __line});
-});
+search.indexAllPost();
 
 app.listen(app.get('port'), function(){
 	logger.info('express server listening on port ' + app.get('port'));

@@ -1,8 +1,6 @@
 var lunr = require('lunr'),
-	PostMeta = require('./model/post-meta'),
 	Post = require('./model/post'),
-	logger = require('./util/logger').getLogger(),
-	uuid = require('node-uuid');
+	logger = require('./util/logger').getLogger();
 
 var wikiIndex = lunr(function(){
 	this.field('title', 100);
@@ -26,15 +24,13 @@ function indexPost(post){
 exports.indexPost = indexPost;
 
 exports.indexAllPost = function(){
-	var titles = PostMeta.titles();
-	for(var i=0; i<titles.length; i++){
-		Post.load(titles[i])
-		.then(function(post){
+	Post.loadAll().then(function(posts){
+		posts.forEach(function(post){
 			indexPost(post);
-		}).catch(function(e){
-			logger.error({ err: e.toString(), filename: __filename, line: __line });
 		});
-	} //for i
+	}).catch(function(e){
+		logger.error({ err: e.toString(), filename: __filename, line: __line });
+	});
 }; //indexAllPost
 
 exports.unindexPost = function(title){
