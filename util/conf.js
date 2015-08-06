@@ -1,5 +1,5 @@
 module.exports = {
-	port: 80,
+	port: 8888,
 	logger: {
 		console: {
 			level: 'debug',
