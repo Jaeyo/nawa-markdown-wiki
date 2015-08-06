@@ -3,7 +3,8 @@ var logger = require('../util/logger').getLogger(),
 	stringUtil = require('../util/string-util'),
 	walk = require('walk'),
 	moment = require('moment'),
-	path = require('path');
+	path = require('path'),
+	Joi = require('joi');
 
 /*
  *	list[title]: {
@@ -26,19 +27,28 @@ function PostMeta(){
 
 module.exports = PostMeta;
 
+var schema = Joi.object().keys({
+	filename: Joi.string(),
+	title: Joi.string(),
+	regdate: Joi.date()
+});
+
 PostMeta.prototype = {
 	setFilename: function(filename){
 		this.filename = filename;
+		Joi.validate(this, schema, function(err, value){ if(err) throw err; });
 		return this;
 	}, //setFilename
 
 	setTitle: function(title){
 		this.title = title;
+		Joi.validate(this, schema, function(err, value){ if(err) throw err; });
 		return this;
 	}, //setTitle
 
 	setRegdate: function(regdate){
 		this.regdate = regdate;
+		Joi.validate(this, schema, function(err, value){ if(err) throw err; });
 		return this;
 	} //setRegdate
 }; //PostMeta
@@ -153,7 +163,7 @@ PostMeta.refresh = function(){
 
 					var filepath = path.join(root, file.name).substring('data/'.length); // path/to/file/title.20150101010100.md
 					var splitedFilename = file.name.split('.');
-					var regdate = moment(splitedFilename[splitedFilename.length - 2], 'YYYYMMDDHHmmss');
+					var regdate = moment(splitedFilename[splitedFilename.length - 2], 'YYYYMMDDHHmmss').toDate();
 					var splitedFilepath = filepath.split('.');
 					var title = splitedFilepath.splice(0, splitedFilepath.length-2).join('.');
 

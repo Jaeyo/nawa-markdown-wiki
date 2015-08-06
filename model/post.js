@@ -4,37 +4,49 @@ var logger = require('../util/logger').getLogger(),
 	fs = require('fs'),
 	moment = require('moment'),
 	path = require('path'),
-	walk = require('walk');
+	walk = require('walk'),
+	Joi = require('joi');
 
 function Post(){
 	/*
 	 * {
 	 * 		title: (string),
-	 * 		contents: (content)
+	 * 		contents: (string),
+	 * 		regdate: (date)
 	 * }
 	 */
 } //INIT
 
 module.exports = Post;
 
+var schema = Joi.object().keys({
+	title: Joi.string(),
+	contents: Joi.string(),
+	regdate: Joi.date()
+});
+
 Post.prototype = {
 	setTitle: function(title){
 		this.title = title;
+		Joi.validate(this, schema, function(err, value){ if(err) throw err; });
 		return this;
 	}, //setTitle
 
 	setContents: function(contents){
 		this.contents = contents;
+		Joi.validate(this, schema, function(err, value){ if(err) throw err; });
 		return this;
 	}, //setContents
 
 	setRegdate: function(regdate){
 		this.regdate = regdate;
+		Joi.validate(this, schema, function(err, value){ if(err) throw err; });
 		return this;
 	} //setRegdate
 }; //Post
 
 Post.save = function(post){
+	Joi.validate(post, schema, function(err, value){ if(err) throw err; });
 	var filename = post.title + '.' + moment().format('YYYYMMDDHHmmss') + '.md';
 	return new Promise(function(resolve, reject){
 		fsUtil.writeFile('data/' + filename, post.contents)
@@ -57,7 +69,7 @@ Post.load = function(title){
 		} //if
 
 		var filepath = path.join('data/', postMeta.filename);
-		var regdate = moment(/(.*)(\.)(\d{14})(.md)$/g.exec(postMeta.filename)[3], 'YYYYMMDDHHmmss');
+		var regdate = moment(/(.*)(\.)(\d{14})(.md)$/g.exec(postMeta.filename)[3], 'YYYYMMDDHHmmss').toDate();
 		fs.readFile(filepath, {encoding: 'utf8'}, function(err, data){
 			if(err){
 				 reject(JSON.stringify({err: err, filename: __filename, line: __line}));
