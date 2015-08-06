@@ -1,0 +1,28 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<% include inc/head.ejs %>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 contents">
+			</div>
+			<div class="col-md-4">
+				<div class="well">
+					<% include inc/nav.ejs %>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script>
+		var socket = io.connect('/');
+		socket.on('news', function(data){
+			console.log(data);
+			socket.emit('my other event', {my: 'dataaaaaaa'})
+		});
+	</script>
+</body>
+</html>

@@ -15,6 +15,14 @@ exports.controller = function(app){
 	});
 	// GET /
 	
+	//DEBUG
+	app.get('/Test/', function(req, resp){
+		resp.render('test', {
+			postTitleTreeData: JSON.stringify(PostMeta.titleTree()),
+		});
+	});
+	// GET /Test/
+	
 	logger.info('handler for GET "/Search/*" registered');
 	app.get('/Search/*', function(req, resp){
 		var keyword = decodeURI(req.path.substring('/Search/'.length, req.path.length));
