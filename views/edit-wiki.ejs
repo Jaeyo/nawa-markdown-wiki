@@ -1,0 +1,36 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<% include inc/head.ejs %>
+	<link href="/custom/css/edit-wiki.css" rel="stylesheet">
+
+	<link rel="stylesheet" href="//maxcdn.bootstrapcdn.com/font-awesome/latest/css/font-awesome.min.css">
+	<link rel="stylesheet" href="//cdn.jsdelivr.net/simplemde/latest/simplemde.min.css">
+	<script src="//cdn.jsdelivr.net/simplemde/latest/simplemde.min.js"></script>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 contents">
+				<h1><%= title %></h1>
+				<hr />
+				<div>
+					<textarea class="form-control" rows="20"><%= contents %></textarea>
+				</div>
+				<hr />
+				<div>
+					<button type="button" class="btn btn-primary pull-right" onclick="controller.post();">ok</button>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="well">
+					<% include inc/nav.ejs %>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="/custom/js/edit-wiki.js"></script>
+</body>
+</html>

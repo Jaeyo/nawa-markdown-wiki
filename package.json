@@ -1,0 +1,29 @@
+{
+  "name": "wiki",
+  "version": "0.0.1",
+  "description": "wiki for team nawa",
+  "main": "app.js",
+  "dependencies": {
+    "body-parser": "^1.13.2",
+    "ejs": "^2.3.3",
+    "express": "^4.13.1",
+    "js_cols": "^1.0.1",
+    "lunr": "^0.5.11",
+    "marked": "^0.3.4",
+    "mkdirp": "^0.5.1",
+    "moment": "^2.10.6",
+    "mysql": "^2.8.0",
+    "node-uuid": "^1.4.3",
+    "walk": "^2.3.9",
+    "winston": "^1.0.1"
+  },
+  "devDependencies": {},
+  "scripts": {
+    "test": "wiki"
+  },
+  "keywords": [
+    "wiki"
+  ],
+  "author": "leejy",
+  "license": "ISC"
+}

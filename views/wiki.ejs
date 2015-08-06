@@ -1,0 +1,41 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<% include inc/head.ejs %>
+	<link href="/custom/css/wiki.css" rel="stylesheet">
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 contents-panel">
+				<div class="pull-right"><%= regdate %></div>
+				<h1 class="header-title"><%= title %></h1>
+				<hr />
+				<div class="contents"><%- contents %></div>
+				<hr />
+				<div>&nbsp;
+					<span class="pull-right">
+						<a href="/EditWiki/<%= title %>/">[ edit ]</a>
+					</span>
+					<span class="pull-right">
+						<a href="#" onclick="controller.deletePost();">[ delete ]</a>
+					</span>
+					<span class="pull-right">
+						<a href="/WikiHistory/<%= title %>/">[ history ]</a>
+					</span>
+
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="well">
+					<% include inc/nav.ejs %>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<input type="hidden" id="hidden-post-title" value="<%= title %>" />
+	<script src="/custom/js/wiki.js"></script>
+</body>
+</html>

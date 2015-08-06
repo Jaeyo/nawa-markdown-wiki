@@ -1,0 +1,37 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<% include inc/head.ejs %>
+	<link href="/custom/css/search.css" rel="stylesheet">
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8 contents">
+				<h1><%= keyword %></h1>
+				<hr />
+				<% if(results === null){ %>
+					<div class="div-no-results"><span>no results</span></div>
+				<% } else { %>
+					<% results.forEach(function(result){ %>
+						<div class="div-result">
+							<div>
+								<a href="/Wiki/<%= result.title %>"><h3><%- result.title %></h3></a>
+							</div>
+							<div class="div-result-contents"><%- result.contents %></div>
+						</div>
+					<% }); %>
+				<% } //if %>
+			</div>
+			<div class="col-md-4">
+				<div class="well">
+					<% include inc/nav.ejs %>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<script src="/custom/js/search.js"></script>
+</body>
+</html>

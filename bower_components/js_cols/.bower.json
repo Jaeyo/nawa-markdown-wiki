@@ -1,0 +1,22 @@
+{
+  "name": "js_cols",
+  "version": "1.0.1",
+  "main": "dist/js_cols.min.js",
+  "ignore": [
+    ".jshintrc",
+    "**/*.txt"
+  ],
+  "dependencies": {},
+  "devDependencies": {},
+  "homepage": "https://github.com/thomasstjerne/js_cols",
+  "_release": "1.0.1",
+  "_resolution": {
+    "type": "version",
+    "tag": "v1.0.1",
+    "commit": "b0eced03bc7a355d812e805946376b3272eecbc8"
+  },
+  "_source": "git://github.com/thomasstjerne/js_cols.git",
+  "_target": "~1.0.1",
+  "_originalSource": "js_cols",
+  "_direct": true
+}

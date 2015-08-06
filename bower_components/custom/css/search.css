@@ -1,0 +1,26 @@
+.div-no-results {
+	width: 100%;
+	height: 100%;
+}
+
+.div-no-results span {
+	position: absolute;
+	top: 50%;
+	left: 50%;
+	transform: translate(-50%, -50%);
+}
+
+.div-result {
+	padding: 15px;
+	margin-bottom: 20px;
+}
+.div-result-contents {
+	width: 100%;
+	height: 300px;
+	overflow-y: auto;
+	border: 1px solid rgb(180, 180, 180);
+}
+.keyword {
+	background-color: yellow;
+	font-weight: bolder;
+}
