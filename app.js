@@ -9,7 +9,8 @@ var express = require('express'),
 	PostMeta = require('./model/post-meta'),
 	app = express();
 
-app.set('port', conf.port);
+// app.set('port', conf.port);
+app.set('port', process.env.PORT);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use(bodyParser.json());
@@ -18,10 +19,12 @@ app.use(express.static(path.join(__dirname, 'bower_components')));
 
 fs.readdirSync('./controllers').forEach(function(file){
 	if(file.substr(-3) == '.js'){
-	route = require('./controllers/' + file);
+	var route = require('./controllers/' + file);
 	route.controller(app);
 	} //if
 });
+
+setGlobalProperties();
 
 PostMeta.refresh()
 .then(function(){
@@ -36,29 +39,28 @@ app.listen(app.get('port'), function(){
 });
 
 
-
-
-Object.defineProperty(global, '__stack', {
-	get: function(){
-		var orig = Error.prepareStackTrace;
-		Error.prepareStackTrace = function(_, stack){ return stack; };
-		var err = new Error;
-		Error.captureStackTrace(err, arguments.callee);
-		var stack = err.stack;
-		Error.prepareStackTrace = orig;
-		return stack;
-	}
-});
-
-Object.defineProperty(global, '__line', {
-	get: function(){
-		return __stack[1].getLineNumber();
-	}
-});
-
-Object.defineProperty(global, '__filename', {
-	get: function(){
-		return __stack[1].getEvalOrigin();
-	}
-});
-
+function setGlobalProperties(){
+	Object.defineProperty(global, '__stack', {
+		get: function(){
+			var orig = Error.prepareStackTrace;
+			Error.prepareStackTrace = function(_, stack){ return stack; };
+			var err = new Error;
+			Error.captureStackTrace(err, arguments.callee);
+			var stack = err.stack;
+			Error.prepareStackTrace = orig;
+			return stack;
+		}
+	});
+	
+	Object.defineProperty(global, '__line', {
+		get: function(){
+			return __stack[1].getLineNumber();
+		}
+	});
+	
+	Object.defineProperty(global, '__filename', {
+		get: function(){
+			return __stack[1].getEvalOrigin();
+		}
+	});
+}; //setGlobalProperties
