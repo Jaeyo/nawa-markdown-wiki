@@ -6,7 +6,8 @@ var logger = require('../util/logger').getLogger(),
 	precondition = require('../util/precondition'),
 	marked = require('marked'),
 	search = require('../search'),
-	util = require('util');
+	util = require('util'),
+	moment = require('moment');
 
 exports.controller = function(app){
 	logger.info('handler for GET "/" registered');
@@ -67,7 +68,7 @@ exports.controller = function(app){
 				postTitleTreeData: JSON.stringify(PostMeta.titleTree()),
 				title: title,
 				contents: marked(post.contents),
-				regdate: post.regdate
+				regdate: moment(post.regdate).fromNow()
 			});
 		})
 		.catch(function(e){
