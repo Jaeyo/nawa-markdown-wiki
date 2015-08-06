@@ -113,7 +113,8 @@ Post.delete = function(title){
 
 Post.titles = function(){
 	return new Promise(function(resolve, reject){
-		postDB.find( {isRecent: true}, function(err, docs){
+		postDB.find({ isRecent: true }).sort({ title: 1 }).exec(function(err, docs){
+		//postDB.find( {isRecent: true}, function(err, docs){
 			if(err){ reject(err); return; }
 			var titles = [];
 			docs.forEach(function(doc){
