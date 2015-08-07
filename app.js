@@ -6,7 +6,8 @@ var express = require('express'),
 	conf = require('./util/conf'),
 	logger = require('./util/logger').getLogger(),
 	app = express(),
-	io = require('socket.io');
+	io = require('socket.io'),
+	platform = require('platform');
 
 //app.set('port', conf.port);
 app.set('port', process.env.PORT);
@@ -26,6 +27,16 @@ fs.readdirSync('./controllers').forEach(function(file){
 setGlobalProperties();
 
 search.indexAllPost();
+
+logger.info({
+	platform: {
+		name: platform.name,
+		version: platform.version,
+		osArchitecture: platform.os.architecture,
+		osFamily: platform.os.family,
+		description: platform.description
+	}
+});
 
 var server = app.listen(app.get('port'), function(){
 	logger.info('express server listening on port ' + app.get('port'));
