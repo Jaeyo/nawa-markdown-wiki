@@ -13,12 +13,12 @@
 				<% diff.forEach(function(diffLine){ %>
 					<% if(diffLine.added){ %>
 						<label>added</label>
-						<div class="added-line"><%= diffLine.value %></div>
+						<div class="added-line"><%- diffLine.value %></div>
 					<% } else if(diffLine.removed){ %>
 						<label>removed</label>
-						<div class="removed-line"><%= diffLine.value %></div>
+						<div class="removed-line"><%- diffLine.value %></div>
 					<% } else { %>
-						<div class="unchanged-line"><%= diffLine.value %></div>
+						<div class="unchanged-line"><%- diffLine.value %></div>
 					<% } //if %>
 				<% }); %>
 			</div>

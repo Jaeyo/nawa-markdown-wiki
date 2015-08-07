@@ -165,6 +165,10 @@ exports.controller = function(app){
 								jsdiff.diffLines(leftPost.contents, rightPost.contents) : 
 								jsdiff.diffLines(rightPost.contents, leftPost.contents);
 			
+			diffResult.forEach(function(diffLine){ //DEBUG
+				diffLine.value = marked(diffLine.value);
+			});
+
 			resp.render('wiki-diff', {
 				title: util.format('diff: %s - %s', leftPost.title, rightPost.title),
 				postTitleTreeData: JSON.stringify(titleTree),
@@ -176,7 +180,7 @@ exports.controller = function(app){
 			resp.render('err-500', {});
 		});
 	});
-	// GET /EditWiki/*
+	// GET /WikiDiff/:leftPostUUID/:rightPostUUID/
 	
 	logger.info('handler for GET "/EditWiki/*" registered');
 	app.get('/EditWiki/*', function(req, resp){

@@ -9,8 +9,8 @@ var express = require('express'),
 	server = require('http').Server(app),
 	io = require('socket.io').listen(server);
 
-// app.set('port', conf.port);
-app.set('port', process.env.PORT);
+app.set('port', conf.port);
+//app.set('port', process.env.PORT);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use(bodyParser.json());
