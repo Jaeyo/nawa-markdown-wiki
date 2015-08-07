@@ -1,6 +1,7 @@
 var logger = require('../util/logger').getLogger(),
 	Joi = require('joi'),
-	postDB = require('../db/db').postDB;
+	postDB = require('../db/db').postDB,
+	Promise = require('songbird');
 
 function Post(){
 	/*
@@ -57,23 +58,17 @@ Post.prototype = {
 }; //Post
 
 Post.save = function(post){
-	return new Promise(function(resolve, reject){
-		Joi.validate(post, schema, function(err, value){ if(err) throw err; });
-		new Promise(function(resolve, reject){
-			postDB.update({title: post.title, isRecent: true}, 
-				{$set: {isRecent: false} }, 
-				{multi: true}, 
-				function(err, numReplaced){
-					if(err){ reject(err); return; }
-					resolve();
-			});
-		}).then(function(){
-			postDB.insert(post, function(err, newDoc){
-				if(err){ reject(err); return; }
-				resolve();
-			});
-		});
-	});
+    return new Promise(function(resolve, reject){
+        postDB.promise.update({ title: post.title, isRecent: true }, 
+            { $set: { isRecent: false } }, 
+            { multi: true })
+        .then(postDB.promise.insert(post))
+        .then(function(newDoc){
+            resolve();
+        }).catch(function(e){
+            reject(e); 
+        });
+    });
 }; //save
 
 Post.load = function(title){
@@ -94,9 +89,11 @@ Post.load = function(title){
 
 Post.loadHistory = function(title){
 	return new Promise(function(resolve, reject){
-		postDB.find({ title: title }).sort({ regdate: -1 }).exec(function(err, docs){
-			if(err){ reject(err); return; }
-			if(docs === null){ resolve(null); return; }
+		postDB.find({ title: title })
+		.sort({ regdate: -1 })
+		.promise
+		.exec()
+		.then(function(docs){
 			var posts = [];
 			docs.forEach(function(doc){
 				var post = new Post()
@@ -108,14 +105,16 @@ Post.loadHistory = function(title){
 				posts.push(post);
 			});
 			resolve(posts);
+		}).catch(function(e){
+			reject(e);
 		});
 	});
 }; //loadHistory
 
 Post.loadByUUID = function(uuid){
 	return new Promise(function(resolve, reject){
-		postDB.findOne({ uuid: uuid }, function(err, doc){
-			if(err){ reject(err); return; }
+		postDB.promise.findOne({ uuid: uuid })
+		.then(function(doc){
 			if(doc === null){ resolve(null); return; }
 			var post = new Post()
 				.setTitle(doc.title)
@@ -124,14 +123,16 @@ Post.loadByUUID = function(uuid){
 				.setIsRecent(doc.isRecent)
 				.setUUID(doc.uuid);
 			resolve(post);
+		}).catch(function(e){
+			reject(e);
 		});
 	});
 }; //loadById
 
 Post.loadAll = function(){
 	return new Promise(function(resolve, reject){
-		postDB.find(null, function(err, docs){
-			if(err){ reject(err); return; }
+		postDB.promise.find(null)
+		.then(function(docs){
 			var posts = [];
 			docs.forEach(function(doc){
 				var post = new Post()
@@ -143,29 +144,37 @@ Post.loadAll = function(){
 				posts.push(post);
 			});
 			resolve(posts);
+		}).catch(function(e){
+			reject(e);
 		});
 	});
 }; //loadAll
 
 Post.delete = function(title){
 	return new Promise(function(resolve, reject){
-		postDB.update( {title: title}, {$set: {isRecent: false}}, {multi: true}, function(err, numReplaced){
-			if(err){ reject(err); return; }
+		postDB.promise.update( {title: title}, {$set: {isRecent: false}}, {multi: true} )
+		.then(function(numReplaced){
 			resolve();
+		}).catch(function(e){
+			reject(e);		
 		});
 	});
 }; //delete
 
 Post.titles = function(){
 	return new Promise(function(resolve, reject){
-		postDB.find({ isRecent: true }).sort({ title: 1 }).exec(function(err, docs){
-		//postDB.find( {isRecent: true}, function(err, docs){
-			if(err){ reject(err); return; }
+		postDB.find({ isRecent: true })
+		.sort({ title: 1 })
+		.promise
+		.exec()
+		.then(function(docs){
 			var titles = [];
 			docs.forEach(function(doc){
 				titles.push(doc.title);
 			});
 			resolve(titles);
+		}).catch(function(e){
+			reject(e);
 		});
 	});
 }; //titles
