@@ -1,0 +1,33 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<title><%= title %></title>
+	<% include inc/head.ejs %>
+	<link href="/custom/css/wiki-diff.css" rel="stylesheet">
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<% diff.forEach(function(diffLine){ %>
+					<% if(diffLine.added){ %>
+						<label>added</label>
+						<div class="added-line"><%= diffLine.value %></div>
+					<% } else if(diffLine.removed){ %>
+						<label>removed</label>
+						<div class="removed-line"><%= diffLine.value %></div>
+					<% } else { %>
+						<div class="unchanged-line"><%= diffLine.value %></div>
+					<% } //if %>
+				<% }); %>
+			</div>
+			<div class="col-md-4">
+				<div class="well">
+					<% include inc/nav.ejs %>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

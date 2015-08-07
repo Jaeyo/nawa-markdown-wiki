@@ -1,0 +1,41 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<title><%= title %></title>
+	<% include inc/head.ejs %>
+	<link href="/custom/css/wiki-history.css" rel="stylesheet">
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<h1><%= title %></h1>
+				<hr />
+				<% if(posts === null){ %>
+					<div>no history</div>
+				<% } else { %>
+					<% posts.forEach(function(post){ %>
+						<div class="post">
+							<span><%= post.regdate %></span>
+							<button type="button" class="btn btn-xs btn-info" onclick="window.location.href='/WikiArchive/<%= post.uuid %>/'">view</button>
+							<button type="button" class="btn btn-xs btn-info" onclick="window.location.href='/WikiArchiveRaw/<%= post.uuid %>/'">raw</button>
+							<input type="radio" name="left" value="<%= post.uuid %>"/>
+							<input type="radio" name="right" value="<%= post.uuid %>"/>
+						</div>	
+					<% }); %>
+					<button type="button" class="btn btn-xs btn-info pull-right" onclick="controller.diff();">diff</button>
+				<% } //if %>
+			</div>
+			<div class="col-md-4">
+				<div class="well">
+					<% include inc/nav.ejs %>
+				</div>
+			</div>
+		</div>
+	</div>
+	
+	<input type="hidden" id="hidden-post-title" value="<%= title %>" />
+	<script src="/custom/js/wiki-history.js"></script>
+</body>
+</html>

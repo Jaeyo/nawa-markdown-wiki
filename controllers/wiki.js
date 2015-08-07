@@ -5,7 +5,9 @@ var logger = require('../util/logger').getLogger(),
 	marked = require('marked'),
 	search = require('../search'),
 	util = require('util'),
-	moment = require('moment');
+	moment = require('moment'),
+	uuid = require('node-uuid'),
+	jsdiff = require('diff');
 
 exports.controller = function(app){
 	logger.info('handler for GET "/" registered');
@@ -80,6 +82,102 @@ exports.controller = function(app){
 	});
 	// GET /Wiki/*
 	
+	logger.info('handler for GET "/WikiHistory/*" registered');
+	app.get('/WikiHistory/*', function(req, resp){
+		var title = decodeURI(req.path.substring('/WikiHistory/'.length, req.path.length));
+		if(stringUtil.endsWith(title, '/')) title = title.substring(0, title.length-1);
+		
+		Promise.all([ Post.loadHistory(title), Post.titleTree() ])
+		.then(function(args){
+			var posts = args[0];
+			var titleTree = args[1];
+			
+			resp.render('wiki-history', {
+				title: title,
+				postTitleTreeData: JSON.stringify(titleTree),
+				posts: posts
+			});
+		}).catch(function(e){
+			logger.error('while loading wiki history', {e: e.toString(), title: title, filename: __filename, line: __line});
+			logger.error(e.stack);
+			resp.render('err-500', {});
+		});
+	}); 
+	// GET /WikiHistory/*
+	
+	logger.info('handler for GET "/WikiArchive/:uuid/" registered');
+	app.get('/WikiArchive/:uuid/', function(req, resp){
+		var uuid = req.params.uuid;
+		
+		Promise.all([ Post.loadByUUID(uuid), Post.titleTree() ])
+		.then(function(args){
+			var post = args[0];
+			var titleTree = args[1];
+			
+			resp.render('wiki', {
+				postTitleTreeData: JSON.stringify(titleTree),
+				title: post.title,
+				contents: marked(post.contents),
+				regdate: moment(post.regdate).fromNow()
+			});
+		}).catch(function(e){
+			logger.error('while loading wiki archive', {e: e.toString(), title: title, filename: __filename, line: __line});
+			logger.error(e.stack);
+			resp.render('err-500', {});
+		});
+	});
+	// GET /WikiArchive/:uuid/
+	
+	logger.info('handler for GET "/WikiArchiveRaw/:uuid/" registered');
+	app.get('/WikiArchiveRaw/:uuid/', function(req, resp){
+		var uuid = req.params.uuid;
+		
+		Promise.all([ Post.loadByUUID(uuid), Post.titleTree() ])
+		.then(function(args){
+			var post = args[0];
+			var titleTree = args[1];
+			
+			resp.render('wiki-raw', {
+				postTitleTreeData: JSON.stringify(titleTree),
+				title: post.title,
+				raw: post.contents
+			});
+		}).catch(function(e){
+			logger.error('while loading wiki archive raw', {e: e.toString(), title: title, filename: __filename, line: __line});
+			logger.error(e.stack);
+			resp.render('err-500', {});
+		});
+	});
+	// GET /WikiArchiveRaw/:uuid/
+	
+	logger.info('handler for GET "/WikiDiff/:leftPostUUID/:rightPostUUID/" registered');
+	app.get('/WikiDiff/:leftPostUUID/:rightPostUUID/', function(req, resp){
+		var leftPostUUID = req.params.leftPostUUID;
+		var rightPostUUID = req.params.rightPostUUID;
+		
+		Promise.all([ Post.loadByUUID(leftPostUUID), Post.loadByUUID(rightPostUUID), Post.titleTree() ])
+		.then(function(args){
+			var leftPost = args[0];
+			var rightPost = args[1];
+			var titleTree = args[2];
+			
+			var diffResult = leftPost.regdate < rightPost.regdate ? 
+								jsdiff.diffLines(leftPost.contents, rightPost.contents) : 
+								jsdiff.diffLines(rightPost.contents, leftPost.contents);
+			
+			resp.render('wiki-diff', {
+				title: util.format('diff: %s - %s', leftPost.title, rightPost.title),
+				postTitleTreeData: JSON.stringify(titleTree),
+				diff: diffResult
+			});
+		}).catch(function(e){
+			logger.error({e: e.toString(), filename: __filename, line: __line});
+			logger.error(e.stack);
+			resp.render('err-500', {});
+		});
+	});
+	// GET /EditWiki/*
+	
 	logger.info('handler for GET "/EditWiki/*" registered');
 	app.get('/EditWiki/*', function(req, resp){
 		var title = decodeURI(req.path.substring('/EditWiki/'.length, req.path.length));
@@ -137,7 +235,7 @@ exports.controller = function(app){
 			return;
 		} //catch
 
-		var post = new Post().setTitle(title).setContents(contents).setRegdate(new Date()).setIsRecent(true);
+		var post = new Post().setTitle(title).setContents(contents).setRegdate(new Date()).setIsRecent(true).setUUID(uuid.v4());
 		Post.save(post).then(function(){
 			search.indexPost(post);
 			resp.json({ success: 1, title: title });

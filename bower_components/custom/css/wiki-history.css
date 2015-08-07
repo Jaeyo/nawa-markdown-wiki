@@ -1,0 +1,6 @@
+.post span {
+    margin-right: 10px;
+}
+.post input[name="left"] {
+    margin-left: 15px;
+}

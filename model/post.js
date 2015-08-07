@@ -16,6 +16,7 @@ function Post(){
 module.exports = Post;
 
 var schema = Joi.object().keys({
+	uuid: Joi.string(),
 	title: Joi.string(),
 	contents: Joi.string(),
 	regdate: Joi.date(),
@@ -24,6 +25,12 @@ var schema = Joi.object().keys({
 
 
 Post.prototype = {
+	setUUID: function(uuid){
+		this.uuid = uuid;
+		Joi.validate(this, schema, function(err, value){ if(err) throw err; });
+		return this;
+	}, //setUUID
+	
 	setTitle: function(title){
 		this.title = title;
 		Joi.validate(this, schema, function(err, value){ if(err) throw err; });
@@ -78,11 +85,48 @@ Post.load = function(title){
 				.setTitle(doc.title)
 				.setContents(doc.contents)
 				.setRegdate(doc.regdate)
-				.setIsRecent(doc.isRecent);
+				.setIsRecent(doc.isRecent)
+				.setUUID(doc.uuid)
 			resolve(post);
 		});
 	});
 }; //load
+
+Post.loadHistory = function(title){
+	return new Promise(function(resolve, reject){
+		postDB.find({ title: title }).sort({ regdate: -1 }).exec(function(err, docs){
+			if(err){ reject(err); return; }
+			if(docs === null){ resolve(null); return; }
+			var posts = [];
+			docs.forEach(function(doc){
+				var post = new Post()
+					.setTitle(doc.title)
+					.setContents(doc.contents)
+					.setRegdate(doc.regdate)
+					.setIsRecent(doc.isRecent)
+					.setUUID(doc.uuid);
+				posts.push(post);
+			});
+			resolve(posts);
+		});
+	});
+}; //loadHistory
+
+Post.loadByUUID = function(uuid){
+	return new Promise(function(resolve, reject){
+		postDB.findOne({ uuid: uuid }, function(err, doc){
+			if(err){ reject(err); return; }
+			if(doc === null){ resolve(null); return; }
+			var post = new Post()
+				.setTitle(doc.title)
+				.setContents(doc.contents)
+				.setRegdate(doc.regdate)
+				.setIsRecent(doc.isRecent)
+				.setUUID(doc.uuid);
+			resolve(post);
+		});
+	});
+}; //loadById
 
 Post.loadAll = function(){
 	return new Promise(function(resolve, reject){
@@ -94,7 +138,8 @@ Post.loadAll = function(){
 					.setTitle(doc.title)
 					.setContents(doc.contents)
 					.setRegdate(doc.regdate)
-					.setIsRecent(doc.isRecent);
+					.setIsRecent(doc.isRecent)
+					.setUUID(doc.uuid);
 				posts.push(post);
 			});
 			resolve(posts);

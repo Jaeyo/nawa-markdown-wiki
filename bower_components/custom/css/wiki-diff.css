@@ -1,0 +1,11 @@
+.added-line {
+	background-color: rgb(204, 255, 204);
+	margin-left: 10px;
+}
+.removed-line {
+	background-color: rgb(255, 204, 204);
+	margin-left: 10px;
+}
+.unchanged-line {
+	margin-left: 10px;
+}
