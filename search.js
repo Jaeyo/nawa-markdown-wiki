@@ -30,6 +30,7 @@ exports.indexAllPost = function(){
 		});
 	}).catch(function(e){
 		logger.error({ err: e.toString(), filename: __filename, line: __line });
+		logger.error(e.stack);
 	});
 }; //indexAllPost
 
