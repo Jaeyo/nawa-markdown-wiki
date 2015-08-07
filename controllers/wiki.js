@@ -16,6 +16,19 @@ exports.controller = function(app){
 	});
 	// GET /
 	
+	app.get('/Test/', function(req, resp){
+		Promise.all([ Post.titleTree() ])
+		.then(function(args){
+			var titleTree = args[0];
+			
+			resp.render('test', {
+				postTitleTreeData: JSON.stringify(titleTree),
+				title: 'test'
+			});
+		});
+	});
+	// GET /Test/
+	
 	logger.info('handler for GET "/Search/*" registered');
 	app.get('/Search/*', function(req, resp){
 		var keyword = decodeURI(req.path.substring('/Search/'.length, req.path.length));

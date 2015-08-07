@@ -6,11 +6,10 @@ var express = require('express'),
 	conf = require('./util/conf'),
 	logger = require('./util/logger').getLogger(),
 	app = express(),
-	server = require('http').Server(app),
-	io = require('socket.io').listen(server);
+	io = require('socket.io');
 
-app.set('port', conf.port);
-//app.set('port', process.env.PORT);
+//app.set('port', conf.port);
+app.set('port', process.env.PORT);
 app.set('view engine', 'ejs');
 app.set('views', path.join(__dirname, '/views'));
 app.use(bodyParser.json());
@@ -28,15 +27,16 @@ setGlobalProperties();
 
 search.indexAllPost();
 
-app.listen(app.get('port'), function(){
+var server = app.listen(app.get('port'), function(){
 	logger.info('express server listening on port ' + app.get('port'));
 });
 
-io.sockets.on('connection', function(socket){
-	logger.debug('on connection', {socket: socket}); //DEBUG
-	socket.emit('news', { hello: 'world' });
-	socket.on('my other event', function(data){
-		console.log(data);
+var socket = io.listen(server, {log: true});
+socket.on('connection', function(client){
+	logger.debug('on connection');
+	client.emit('news', { hello: 'world' });
+	client.on('here', function(data){
+		logger.debug('on here, ' + data);
 	});
 });
 

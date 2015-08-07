@@ -1,14 +1,6 @@
-var postDB = require('./db/db').postDB,
-    uuid = require('node-uuid'),
-	util = require('util');
+var songbird = require('songbird'),
+	test = require('./test12');
+	
+//test.test1(1, 2, function(v){ console.log(v); })
 
-postDB.find({}, function(err, docs){
-	docs.forEach(function(doc){
-		if(doc.uuid === undefined){
-			console.log(util.format('%s uuid undefined', doc.title));
-			postDB.update({ _id: doc._id }, { $set: { uuid: uuid.v4() } }, {}, function(){});
-		} //if
-	});
-});
-
-
+test.promise.test1(1, 2).then(function(v){ console.log(v); });
