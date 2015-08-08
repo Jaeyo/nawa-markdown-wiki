@@ -1,0 +1,30 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<title><%= title %></title>
+	<% include inc/head.ejs %>
+	<link href="/custom/css/recent-edited.css" rel="stylesheet">
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<ul>
+				<% for(var i=0; i<posts.length; i++){ %>
+					<li class='post'>
+						<a href="/Wiki/<%= posts[i].title %>/"><%= posts[i].title %></a>
+						<span> [<%= posts[i].regdate %>]</span>
+					</li>
+				<% } //for i %>
+				</ul>
+			</div>
+			<div class="col-md-4">
+				<div class="well">
+					<% include inc/nav.ejs %>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>

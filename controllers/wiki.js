@@ -232,6 +232,30 @@ exports.controller = function(app){
 	});
 	// GET /EditWiki/*
 	
+	logger.info('handler for GET /RecentEditedWiki/ registered');
+	app.get('/RecentEditedWiki/', function(req, resp){
+		Promise.all([ Post.recentEdited(), Post.titleTree() ])
+		.then(function(args){
+			var posts = args[0];
+			var titleTree = args[1];
+			
+			posts.forEach(function(post){
+				post.regdate = moment(post.regdate).fromNow();
+			});
+			
+			resp.render('recent-edited', {
+				postTitleTreeData: JSON.stringify(titleTree),
+				title: 'recent edited',
+				posts: posts
+			});
+		}).catch(function(e){
+			logger.error('while load recent edited posts', {e: e.toString(), filename: __filename, line: __line});
+			logger.error(e.stack);
+			resp.json({ success: 0, errmsg: 'error while editing post' });
+		});
+	});
+	// GET /RecentEditedWiki/
+	
 	logger.info('handler for POST "/Wiki/" registered');
 	app.post('/Wiki/', function(req, resp){
 		var param = JSON.parse(req.body['param']);

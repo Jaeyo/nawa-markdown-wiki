@@ -150,6 +150,21 @@ Post.loadAll = function(){
 	});
 }; //loadAll
 
+Post.recentEdited = function(){
+	return new Promise(function(resolve, reject){
+		postDB.find(null).sort({ regdate: -1 }).promise.exec()
+		.then(function(docs){
+			var posts = [];
+			docs.forEach(function(doc){
+				posts.push(new Post().setTitle(doc.title).setRegdate(doc.regdate));
+			});
+			resolve(posts);
+		}).catch(function(e){
+			reject(e);
+		});
+	});
+}; //recentEdited
+
 Post.delete = function(title){
 	return new Promise(function(resolve, reject){
 		postDB.promise.update( {title: title}, {$set: {isRecent: false}}, {multi: true} )
