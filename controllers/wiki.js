@@ -17,11 +17,6 @@ exports.controller = function(app){
 	});
 	// GET /
 	
-	app.get('/Test/', function(req, resp){
-		resp.json({ success: 1, host: req.headers.host });
-	});
-	// GET /Test/
-	
 	logger.info('handler for GET "/Search/*" registered');
 	app.get('/Search/*', function(req, resp){
 		var keyword = decodeURI(req.path.substring('/Search/'.length, req.path.length));
@@ -288,7 +283,7 @@ exports.controller = function(app){
 		var title = param.title;
 		var msg = param.msg;
 		
-		msg = util.format('%s\n%s/Wiki/%s', msg, req.headers.host, title);
+		msg = util.format('%s\nhttp://%s/Wiki/%s', msg, req.headers.host, title);
 		
 		slack.sendToSlack(channel, msg).then(function(){
 			resp.json({ success: 1 });
