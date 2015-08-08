@@ -18,5 +18,5 @@ module.exports = {
 			maxFiles: 5
 		}
 	},
-	slackWebhookUri: 'https://hooks.slack.com/services/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'
+	slackWebhookUri: 'https://hooks.slack.com/services/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'
 };
