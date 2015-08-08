@@ -7,7 +7,8 @@ var logger = require('../util/logger').getLogger(),
 	util = require('util'),
 	moment = require('moment'),
 	uuid = require('node-uuid'),
-	jsdiff = require('diff');
+	jsdiff = require('diff'),
+	slack = require('../util/slack');
 
 exports.controller = function(app){
 	logger.info('handler for GET "/" registered');
@@ -17,15 +18,7 @@ exports.controller = function(app){
 	// GET /
 	
 	app.get('/Test/', function(req, resp){
-		Promise.all([ Post.titleTree() ])
-		.then(function(args){
-			var titleTree = args[0];
-			
-			resp.render('test', {
-				postTitleTreeData: JSON.stringify(titleTree),
-				title: 'test'
-			});
-		});
+		resp.json({ success: 1, host: req.headers.host });
 	});
 	// GET /Test/
 	
@@ -287,6 +280,25 @@ exports.controller = function(app){
 		});
 	});
 	// POST /Wiki/
+	
+	logger.info('handler for POST "/Export/Slack/');
+	app.post('/Export/Slack/', function(req, resp){
+		var param = JSON.parse(req.body['param']);
+		var channel = param.channel;
+		var title = param.title;
+		var msg = param.msg;
+		
+		msg = util.format('%s\n%s/Wiki/%s', msg, req.headers.host, title);
+		
+		slack.sendToSlack(channel, msg).then(function(){
+			resp.json({ success: 1 });
+		}).catch(function(e){
+			logger.error('error while send wiki to slack', {e: e.toString(), filename: __filename, line: __line});
+			logger.error(e.stack);
+			resp.json({ success: 0, errmsg: 'error while send wiki to slack' });
+		});
+	});
+	// POST /Export/Slack/
 	
 	logger.info('handler for DELETE "/Wiki/" registered');
 	app.delete('/Wiki/', function(req, resp){

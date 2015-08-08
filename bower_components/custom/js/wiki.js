@@ -14,7 +14,19 @@ View.prototype = {
 			console.log(value);//DEBUG
 			$(value).addClass('table table-striped table-bordered');
 		});
-	} //init
+	}, //init
+	sendToSlackDOM: function(){
+		var dom = '';
+		dom += '<div class="input-group input-group-sm">';
+		dom += 		'<span class="input-group-addon">channel</span>';
+		dom += 		'<input id="text-slack-channel" type="text" class="form-control" placeholder="#random">';
+		dom += '</div>';
+		dom += '<div class="input-group input-group-sm">';
+		dom += 		'<span class="input-group-addon">message</span>';
+		dom += 		'<input id="text-slack-message" type="text" class="form-control" />';
+		dom += '</div>';
+		return dom;
+	} //sendToSlackDOM
 }; //View
 
 Controller = function(){
@@ -36,7 +48,34 @@ Controller.prototype = {
 				});
 			});
 		});
-	} //deletePost
+	}, //deletePost
+	sendToSlack: function(){
+		var title = $('h1.header-title').text();
+		bootbox.dialog({
+			title: 'send to slack',
+			message: controller.view.sendToSlackDOM(),
+			buttons: {
+				success: {
+					label: 'send',
+					className: 'btn-success',
+					callback: function(){
+						var param = {
+							title: $('h1.header-title').text(),
+							channel: $('#text-slack-channel').val(),
+							msg: $('#text-slack-message').val()
+						};
+						$.post('/Export/Slack', { param: JSON.stringify(param) }).done(function(resp){
+							if(resp.success != 1){
+								bootbox.alert(JSON.stringify(resp));
+								return;
+							} //if
+							bootbox.alert('success');
+						});
+					} //callback
+				} //success
+			} //buttons
+		});
+	} //sendToSlack
 }; //Controller
 
 $(function(){
