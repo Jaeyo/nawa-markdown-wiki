@@ -152,7 +152,7 @@ Post.loadAll = function(){
 
 Post.recentEdited = function(){
 	return new Promise(function(resolve, reject){
-		postDB.find(null).sort({ regdate: -1 }).promise.exec()
+		postDB.find({ isRecent: true }).sort({ regdate: -1 }).promise.exec()
 		.then(function(docs){
 			var posts = [];
 			docs.forEach(function(doc){
