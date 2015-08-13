@@ -244,6 +244,34 @@ exports.controller = function(app){
 	});
 	// GET /RecentEditedWiki/
 	
+	logger.info('handler for GET "/Export/EntireWiki/ registered');
+	app.get('/Export/EntireWiki/', function(req, resp){
+		Post.loadAll().then(function(posts){
+			resp.attachment('wiki.json');
+			resp.end(JSON.stringify(posts, null, 2), 'utf-8');
+		}).catch(function(e){
+			logger.error('while load recent edited posts', {e: e.toString(), filename: __filename, line: __line});
+			logger.error(e.stack);
+			resp.json({ success: 0, errmsg: 'error while export entire wiki' });
+		});
+	});
+	// GET /Export/EntireWiki/
+	
+	logger.info('handler for GET "/Setting/ registered');
+	app.get('/Setting/', function(req, resp){
+		Post.titleTree().then(function(titleTree){
+			resp.render('setting', {
+				title: 'setting',
+				postTitleTreeData: JSON.stringify(titleTree)
+			});
+		}).catch(function(e){
+			logger.error('while load setting page', {e: e.toString(), filename: __filename, line: __line});
+			logger.error(e.stack);
+			resp.json({ success: 0, errmsg: 'error while setting page' });
+		});
+	});
+	// GET /Setting/
+	
 	logger.info('handler for POST "/Wiki/" registered');
 	app.post('/Wiki/', function(req, resp){
 		var param = JSON.parse(req.body['param']);

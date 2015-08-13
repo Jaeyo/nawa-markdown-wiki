@@ -1,0 +1,24 @@
+<!DOCTYPE Html>
+<html>
+<head>
+	<title><%= title %></title>
+	<% include inc/head.ejs %>
+</head>
+
+<body>
+	<div class="container">
+		<div class="row">
+			<div class="col-md-8">
+				<div class="well">
+					<button type="button" class="btn btn-warn" onclick="window.location.href='/Export/EntireWiki/'">export entire wiki</button>
+				</div>
+			</div>
+			<div class="col-md-4">
+				<div class="well">
+					<% include inc/nav.ejs %>
+				</div>
+			</div>
+		</div>
+	</div>
+</body>
+</html>
