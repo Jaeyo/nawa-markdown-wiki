@@ -1,5 +1,6 @@
 var conf = require('../util/conf'),
-	nedbModel = require('./nedb/post');
+	nedbModel = require('./nedb/post'),
+	logger = require('../util/logger').getLogger();
 
 var model = null;
 if(conf.repository === 'nedb'){
