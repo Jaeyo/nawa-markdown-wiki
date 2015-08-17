@@ -11,7 +11,6 @@ View.prototype = {
 		hljs.initHighlightingOnLoad();
 
 		$('.contents table').each(function(index, value){
-			console.log(value);//DEBUG
 			$(value).addClass('table table-striped table-bordered');
 		});
 	}, //init

@@ -27,7 +27,14 @@ Controller.prototype = {
 
 			window.location.href = '/Wiki/{}/'.format(title);
 		});
-	} //post
+	}, //post
+	preview: function(){
+		var contents = this.view.simplemde.value();
+		$('#div-preview-contents').empty().html(marked(contents));
+		$('html, body').animate({
+			scrollTop: $('#div-preview-contents').offset().top
+		}, 300);
+	} //preview
 }; //Controller
 
 $(function(){

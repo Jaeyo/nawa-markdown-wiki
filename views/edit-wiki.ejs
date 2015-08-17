@@ -20,9 +20,12 @@
 					<textarea class="form-control" rows="20"><%= contents %></textarea>
 				</div>
 				<hr />
-				<div>&nbsp;
+				<div id="div-oper">&nbsp;
 					<button type="button" class="btn btn-primary pull-right" onclick="controller.post();">ok</button>
+					<button type="button" class="btn btn-primary pull-right" onclick="controller.preview();">preview</button>
 				</div>
+				
+				<div id="div-preview-contents"></div>
 			</div>
 			<div class="col-md-4">
 				<div class="well">
