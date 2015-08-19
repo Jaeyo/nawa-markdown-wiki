@@ -11,8 +11,8 @@ var express = require('express'),
 
 // app.set('port', conf.port);
 app.set('port', process.env.PORT);
-app.set('view engine', 'ejs');
-app.set('views', path.join(__dirname, '/views'));
+app.set('view engine', 'jade');
+app.set('views', path.join(__dirname, '/views-jade'));
 app.use(bodyParser.json());
 app.use(bodyParser.urlencoded({ extended: false }));
 app.use(express.static(path.join(__dirname, 'bower_components')));

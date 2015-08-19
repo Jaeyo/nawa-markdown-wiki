@@ -1,0 +1,29 @@
+doctype html
+html
+	head
+		title #{title}
+		include inc/head.jade
+		link(href="/custom/css/wiki.css", rel="stylesheet")
+	body
+		div.container
+			div.row
+				div.col-md-8.contents-panel
+					div.pull-right last updated: #{regdate}
+					h1.header-title #{title}
+					hr
+					div.contents !{contents}
+					hr
+					div &nbsp;
+						span.pull-right
+							a(href="/EditWiki/#{title}/") [ edit ]
+						span.pull-right
+							a(href="#", onclick="controller.deletePost();") [ delete ]
+						span.pull-right
+							a(href="/WikiHistory/#{title}") [ history ]
+						span.pull-right
+							a(href="#", onclick="controller.sendToSlack();") [ send to slack ]
+				div.col-md-4
+					div.well
+						include inc/nav.jade
+		input#hidden-post-title(type="hidden", value="#{title}")
+		script(src="/custom/js/wiki.js")

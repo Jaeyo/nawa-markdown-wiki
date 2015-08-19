@@ -1,0 +1,15 @@
+doctype html
+html
+	head
+		title #{title}
+		include inc/head.jade
+	body
+		div.container
+			div.row
+				div.col-md-8
+					h1 #{title}
+					hr
+					pre !{raw}
+				div.col-md-4
+					div.well
+						include inc/nav.jade

@@ -1,0 +1,27 @@
+doctype html
+head
+	title #{title}
+	include inc/head.jade
+	link(href="/custom/css/wiki-history.css", rel="stylesheet")
+body
+	div.container
+		div.row
+			div.col-md-8
+				h1 #{title}
+				hr
+				if post === null
+					div no history
+				else
+					each post in posts
+						div.post
+							span #{post.regdate}
+							button.btn.btn-xs.btn-info(type="button", onclick="window.location.href='/WikiArchive/#{post.uuid}/'") view
+							button.btn.btn-xs.btn-info(type="button", onclick="window.location.href='/WikiArchiveRaw/#{post.uuid}/'") raw
+							input(type="radio", name="left", value="#{post.uuid}")
+							input(type="radio", name="right", value="#{post.uuid}")
+					button.btn.btn-xs.btn-info.pull-right(type="button", onclick="controller.diff();") diff
+			div.col-md-4		
+				div.well
+					include inc/nav.jade
+	input#hidden-post-title(type="hidden", value="#{title}")
+	script(src="/custom/js/wiki-history.js")

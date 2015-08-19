@@ -1,0 +1,26 @@
+doctype html
+html
+	head
+		title #{keyword}
+		include inc/head.jade
+		link(href="/custom/css/search.css", rel="stylesheet")
+	body
+		div.container
+			div.row
+				div.col-md-8.contents
+					h1 #{keyword}
+					hr
+					if results === null
+						div.div-no-results
+							span no results
+					else
+						each result in results
+							div.div-result
+								div
+									a(href="/Wiki/#{result.title}")
+										h3 !{result.title}
+								div.div-result-contents !{result.contents}
+				div.col-md-4
+					div.well
+						include inc/nav.jade
+		script(src="/custom/js/search.js")

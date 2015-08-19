@@ -1,0 +1,69 @@
+doctype html
+div.nav &nbsp;
+	button.btn.btn-default.btn-xs.pull-right(type="button", onclick="window.location.href='/Setting/';") setting
+	hr
+	
+	div.input-group#div-search
+		input.input-sm.form-control(type="text")
+		div.input-group-btn
+			button.btn.btn-primary.btn-sm(type="button", onclick="search()") search
+	hr
+	
+	h5 documents
+	div#div-post-title-tree
+	hr
+	
+	div(style="margin-bottom: 5px;")
+		button.btn.btn-sm.btn-default(type="button", onclick="newWiki();") new document
+	div
+		button.btn.btn-sm.btn-default(type="button", onclick="window.location.href='/RecentEditedWiki/';") recent edited
+	
+script.
+	function newWiki(){
+		bootbox.prompt('new wiki title', function(title){
+			if(title === null)
+				return;
+	
+			if(title.indexOf('/') === 0){
+				bootbox.alert('slash(/) cannot be in first', newWiki);
+				return;
+			} //if
+	
+			if(title.lastIndexOf('/')+1 === title.length){
+				bootbox.alert('slash(/) cannot be in last', newWiki);
+				return;
+			} //if
+			window.location.href = '/EditWiki/{}/'.format(title);
+		});
+	}; //newWiki
+	
+	function search(){
+		var keyword = encodeURI($('.nav #div-search input[type="text"]').val());
+		window.location.href = '/Search/{}/'.format(keyword);
+	} //search
+	
+	$(function(){
+		$('.nav #div-search input[type="text"]').keyup(function(e){
+			if(e.keyCode === 13){
+				search();		
+			} //if
+		});
+	
+		//init post title tree
+		var titleTreeData = !{postTitleTreeData};
+		$('#div-post-title-tree').on('changed.jstree', function(e, data){
+			var link = data.instance.get_node(data.selected[0]).data;
+			if(link !== null)
+				window.location.href = link;
+		}).jstree({
+			'core': {
+				'multiple': false,
+				'animation': 1,
+				'themes': {
+					'name': 'proton',
+					'responsive': true
+				},
+				'data': titleTreeData
+			}
+		});
+	});

@@ -1,0 +1,14 @@
+doctype html
+html
+	head
+		title #{title}
+		include inc/head.jade
+	body
+		div.container
+			div.row
+				div.col-md-8
+					div.well
+						button.btn.btn-warn(type="button", onclick="window.location.href='/Export/EntireWiki/'") export entire wiki
+				div.col-md-4
+					div.well
+						include inc/nav.jade

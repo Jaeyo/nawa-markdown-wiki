@@ -1,0 +1,18 @@
+doctype html
+html
+	head
+		include inc/head.jade
+	body
+		div.container
+			div.row
+				div.col-md-8.contents
+				div.col-md-4
+					div.well
+						include inc/nav.jade
+		script.
+			var socket = io.connect('/');
+			socket.on('news', function(data){
+				console.log(data);
+				socket.emit('my other event', {my: 'dataaaaaaa'})
+			});
+			socket.emit('here', 'im');

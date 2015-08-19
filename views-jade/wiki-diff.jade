@@ -1,0 +1,22 @@
+doctype html
+html
+	head
+		title #{title}
+		include inc/head.jade
+		link(href="/custom/css/wiki-diff.css", rel="stylesheet")
+	body
+		div.container
+			div.row
+				div.col-md-8
+					each diffLine in diff
+						if diffLine.added
+							label added
+							div.added-line !{diffLine.value}
+						else if diffLine.removed
+							label removed
+							div.removed-line !{diffLine.value}
+						else
+							div.unchanged-line !{diffLine.value}
+				div.col-md-4
+					div.well
+						include inc/nav.jade
