@@ -20,7 +20,7 @@ body
 							input(type="radio", name="left", value="#{post.uuid}")
 							input(type="radio", name="right", value="#{post.uuid}")
 					button.btn.btn-xs.btn-info.pull-right(type="button", onclick="controller.diff();") diff
-			div.col-md-4		
+			div.col-md-4
 				div.well
 					include inc/nav.jade
 	input#hidden-post-title(type="hidden", value="#{title}")
